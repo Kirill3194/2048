@@ -1,9 +1,10 @@
 import pygame
 import random
+import sqlite3
 
 
 class Field:
-    def __init__(self):
+    def __init__(self, login, password):
         self.field = [[0, 0, 0, 0],
                       [0, 0, 0, 0],
                       [0, 0, 0, 0],
@@ -11,6 +12,8 @@ class Field:
         self.score = 0
         self.random_cube()
         self.random_cube()
+        self.login = login
+        self.password = password
 
     def random_cube(self):
         cubes = []
@@ -146,18 +149,38 @@ class Field:
 
 class Registration:
     def __init__(self):
-        pass
+        self.login = 0
+        self.password = 0
 
     def check(self, login, password):
-        pass
+        con = sqlite3.connect("2048_accounts.db")
+        cur = con.cursor()
+        result = cur.execute("""SELECT * FROM player""").fetchall()
+        registration_is_confirmed = True
+        for player in result:
+            if player == login:
+                print('Пользователь под таким логином уже есть!')
+                registration_is_confirmed = False
+        if len(login) <= 3 and registration_is_confirmed:
+            registration_is_confirmed = False
+            print('login слишком маленький, он должен состоять как минимум из 4 символов')
+        elif len(password) <= 5 and registration_is_confirmed:
+            registration_is_confirmed = False
+            print('password слишком маленький, он должен состоять как минимум из 6 символов')
+        return registration_is_confirmed
 
     def registration_player(self):
-        pass
+        self.login = 0
+        self.password = 0
+        if self.check(self.login, self.password):
+            pass
+        else:
+            pass
 
 
 class Entrance:
     def __init__(self):
-        pass
+        pas
 
     def check(self):
         pass
