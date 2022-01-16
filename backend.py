@@ -180,7 +180,7 @@ class Registration:
 
 class Entrance:
     def __init__(self):
-        pas
+        pass
 
     def check(self):
         pass
@@ -189,7 +189,7 @@ class Entrance:
         pass
 
 
-Field1 = Field()
+Field1 = Field('aaaaa', 'aaaaa')
 print(Field1)
 a = input()
 while a != '0':
