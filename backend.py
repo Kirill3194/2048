@@ -4,7 +4,7 @@ import sqlite3
 
 
 class Field:
-    def __init__(self, login, password):
+    def __init__(self, login, password, recommended=False):
         self.field = [[0, 0, 0, 0],
                       [0, 0, 0, 0],
                       [0, 0, 0, 0],
@@ -14,6 +14,31 @@ class Field:
         self.random_cube()
         self.login = login
         self.password = password
+        self.recommended = recommended
+        self.left = 0
+        self.right = 0
+        self.top = 0
+        self.down = 0
+
+
+    def recommended_move(self):
+        field_copy = self.field.copy()
+        self.left_move()
+        self.field = field_copy.copy()
+        self.right_move()
+        self.field = field_copy.copy()
+        self.down_move()
+        self.field = field_copy.copy()
+        self.top_move()
+        self.field = field_copy.copy()
+        if self.left >= self.right and self.down <= self.left and self.left >= self.top:
+            return 'left'
+        elif self.right >= self.down and self.right >= self.top and self.right >= self.left:
+            return 'right'
+        elif self.top >= self.right and self.top >= self.down and self.top >= self.left:
+            return 'top'
+        elif self.down >= self.right and self.down >= self.top and self.down >= self.left:
+            return 'down'
 
     def random_cube(self):
         cubes = []
@@ -26,6 +51,7 @@ class Field:
 
     def left_move(self):
         summ = 0
+        connection = 0
         for y in range(len(self.field)):
             for x in range(len(self.field)):
                 for cord_x in range(len(self.field)):
@@ -41,15 +67,18 @@ class Field:
                             break
                         change_x -= 1
                 if x + 1 < len(self.field) and self.field[y][x] == self.field[y][x + 1] and self.field[y][x] != 0:
+                    connection += 1
                     self.field[y][x] = self.field[y][x] * 2
                     self.score += self.field[y][x]
                     self.field[y][x + 1] = 0
                     summ += 1
         if summ > 0:
             self.random_cube()
+        self.left = connection
 
     def right_move(self):
         summ = 0
+        connection = 0
         for y in range(len(self.field)):
             for x in range(len(self.field) - 1, -1, -1):
                 for cord_x in range(len(self.field) - 1, -1, -1):
@@ -65,15 +94,18 @@ class Field:
                             break
                         change_x += 1
                 if x - 1 >= 0 and self.field[y][x] == self.field[y][x - 1] and self.field[y][x] != 0:
+                    connection += 1
                     self.field[y][x] = self.field[y][x] * 2
                     self.score += self.field[y][x]
                     self.field[y][x - 1] = 0
                     summ += 1
         if summ > 0:
             self.random_cube()
+        self.right = connection
 
     def down_move(self):
         summ = 0
+        connection = 0
         for x in range(len(self.field)):
             for y in range(len(self.field) - 1, -1, -1):
                 for cord_y in range(len(self.field) - 1, -1, -1):
@@ -89,15 +121,18 @@ class Field:
                             break
                         change_y += 1
                 if y - 1 >= 0 and self.field[y][x] == self.field[y - 1][x] and self.field[y][x] != 0:
+                    connection += 1
                     self.field[y][x] = self.field[y][x] * 2
                     self.field[y - 1][x] = 0
                     summ += 1
                     self.score += self.field[y][x]
         if summ > 0:
             self.random_cube()
+        self.down = connection
 
     def top_move(self):
         summ = 0
+        connection = 0
         for x in range(len(self.field)):
             for y in range(len(self.field)):
                 for cord_y in range(len(self.field)):
@@ -113,12 +148,14 @@ class Field:
                             break
                         change_y -= 1
                 if y + 1 < len(self.field) and self.field[y][x] == self.field[y + 1][x] and self.field[y][x] != 0:
+                    connection += 1
                     self.field[y][x] = self.field[y][x] * 2
                     self.field[y + 1][x] = 0
                     summ += 1
                     self.score += self.field[y][x]
         if summ > 0:
             self.random_cube()
+        self.top = connection
 
     def __str__(self):
         for y in range(len(self.field)):
@@ -142,6 +179,19 @@ class Field:
                       [0, 0, 0, 0],
                       [0, 0, 0, 0],
                       [0, 0, 0, 0]]
+        con = sqlite3.connect("2048_accounts.db")
+        cur = con.cursor()
+        result = [i[:2] for i in cur.execute('SELECT login, password FROM players')]
+        number = 0
+        for player in range(len(result)):
+            if result[player][0] == self.login and result[player][1] == self.password:
+                number = player
+                break
+        max_score = [i[0] for i in cur.execute('SELECT max_score FROM max_score')]
+        if max_score[number][0] < self.score:
+            cur.execute("""UPDATE max_score
+                                SET max_score = (?)
+                                WHERE id_score = (?)""", [self.score, number + 1])
         self.score = 0
         self.random_cube()
         self.random_cube()
@@ -149,18 +199,19 @@ class Field:
 
 class Registration:
     def __init__(self):
-        self.login = 0
-        self.password = 0
+        self.login = 'Kirill2001'
+        self.password = 'Kirill2001'
 
     def check(self, login, password):
         con = sqlite3.connect("2048_accounts.db")
         cur = con.cursor()
-        result = cur.execute("""SELECT * FROM player""").fetchall()
+        result = [i[0] for i in cur.execute('SELECT login FROM players')]
         registration_is_confirmed = True
         for player in result:
             if player == login:
                 print('Пользователь под таким логином уже есть!')
                 registration_is_confirmed = False
+                break
         if len(login) <= 3 and registration_is_confirmed:
             registration_is_confirmed = False
             print('login слишком маленький, он должен состоять как минимум из 4 символов')
@@ -170,29 +221,59 @@ class Registration:
         return registration_is_confirmed
 
     def registration_player(self):
-        self.login = 0
-        self.password = 0
+        con = sqlite3.connect("2048_accounts.db")
+        cur = con.cursor()
+        result = [i[0] for i in cur.execute('SELECT login FROM players')]
         if self.check(self.login, self.password):
-            pass
-        else:
-            pass
+            player = [(len(result) + 1, self.login, self.password)]
+            cur.executemany('INSERT INTO players VALUES(?,?,?)', player)
+            rating = [(len(result) + 1, 0)]
+            cur.executemany('INSERT INTO max_score VALUES(?,?)', rating)
+            con.commit()
+            print('Поздравляем с успешной регистрацией!')
 
 
 class Entrance:
     def __init__(self):
-        pass
+        self.login = 'Kirill2001'
+        self.password = 'Kirill2001'
 
     def check(self):
-        pass
+        entrance = False
+        con = sqlite3.connect("2048_accounts.db")
+        cur = con.cursor()
+        result = [i[:2] for i in cur.execute('SELECT login, password FROM players')]
+        for player in result:
+            if self.login == player[0]:
+                if self.password == player[1]:
+                    return True
+                else:
+                    print('Неверный пароль!')
+                entrance = True
+                break
+        if entrance:
+            print('Пользователя с таким логином не существует!')
+        return False
 
     def entrance_player(self):
-        pass
+        if self.check():
+            print("Игра началась!")
+            print("Выбирайте сторону куда хотите ходить:\n"
+                  "напишите l если вы хотите пойти влево\n"
+                  "напишите r если вы хотите пойти вправо\n"
+                  "напишите t если вы хотите пойти вверх\n"
+                  "напишите d если вы хотите пойти вниз\n"
+                  "напишите new если вы хотите начать новую игру")
+            Field1 = Field(self.login, self.password)
+            print(Field1)
+            a = input()
+            while a != '0':
+                Field1.move(a)
+                print(Field1)
+                a = input()
 
 
-Field1 = Field('aaaaa', 'aaaaa')
-print(Field1)
-a = input()
-while a != '0':
-    Field1.move(a)
-    print(Field1)
-    a = input()
+Registration1 = Registration()
+Registration1.registration_player()
+Entrance1 = Entrance()
+Entrance1.entrance_player()
