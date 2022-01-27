@@ -199,8 +199,8 @@ class Field:
 
 class Registration:
     def __init__(self):
-        self.login = 'Kirill2001'
-        self.password = 'Kirill2001'
+        self.login = 'Гошан228'
+        self.password = '332332'
 
     def check(self, login, password):
         con = sqlite3.connect("2048_accounts.db")
@@ -235,8 +235,8 @@ class Registration:
 
 class Entrance:
     def __init__(self):
-        self.login = 'Kirill2001'
-        self.password = 'Kirill2001'
+        self.login = 'Гошан228'
+        self.password = '332332'
 
     def check(self):
         entrance = False
@@ -259,21 +259,15 @@ class Entrance:
         if self.check():
             print("Игра началась!")
             print("Выбирайте сторону куда хотите ходить:\n"
-                  "напишите l если вы хотите пойти влево\n"
-                  "напишите r если вы хотите пойти вправо\n"
-                  "напишите t если вы хотите пойти вверх\n"
-                  "напишите d если вы хотите пойти вниз\n"
+                  "нажимайте стрелочку влево если вы хотите пойти влево\n"
+                  "нажимайте стрелочку вправо если вы хотите пойти вправо\n"
+                  "нажимайте стрелочку вверх если вы хотите пойти вверх\n"
+                  "нажимайте стрелочку вниз если вы хотите пойти вниз\n"
                   "напишите new если вы хотите начать новую игру")
-            Field1 = Field(self.login, self.password)
-            print(Field1)
+            self.Field1 = Field(self.login, self.password)
+            print(self.Field1)
             a = input()
             while a != '0':
-                Field1.move(a)
-                print(Field1)
+                self.Field1.move(a)
+                print(self.Field1)
                 a = input()
-
-
-Registration1 = Registration()
-Registration1.registration_player()
-Entrance1 = Entrance()
-Entrance1.entrance_player()
