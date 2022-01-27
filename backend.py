@@ -188,13 +188,26 @@ class Field:
                 number = player
                 break
         max_score = [i[0] for i in cur.execute('SELECT max_score FROM max_score')]
-        if max_score[number][0] < self.score:
+        if int(max_score[number]) < self.score:
             cur.execute("""UPDATE max_score
                                 SET max_score = (?)
                                 WHERE id_score = (?)""", [self.score, number + 1])
+        con.commit()
         self.score = 0
         self.random_cube()
         self.random_cube()
+
+    def max_score(self):
+        con = sqlite3.connect("2048_accounts.db")
+        cur = con.cursor()
+        result = [i[:2] for i in cur.execute('SELECT login, password FROM players')]
+        number = 0
+        for player in range(len(result)):
+            if result[player][0] == self.login and result[player][1] == self.password:
+                number = player
+                break
+        max_score = [i[0] for i in cur.execute('SELECT max_score FROM max_score')][number]
+        return max_score
 
 
 class Registration:
@@ -207,67 +220,61 @@ class Registration:
         cur = con.cursor()
         result = [i[0] for i in cur.execute('SELECT login FROM players')]
         registration_is_confirmed = True
+        a = ''
         for player in result:
             if player == login:
-                print('Пользователь под таким логином уже есть!')
+                a = 'Пользователь под таким логином уже есть!'
                 registration_is_confirmed = False
                 break
         if len(login) <= 3 and registration_is_confirmed:
             registration_is_confirmed = False
-            print('login слишком маленький, он должен состоять как минимум из 4 символов')
+            a = 'login слишком маленький, он должен состоять как минимум из 4 символов'
         elif len(password) <= 5 and registration_is_confirmed:
             registration_is_confirmed = False
-            print('password слишком маленький, он должен состоять как минимум из 6 символов')
-        return registration_is_confirmed
+            a = 'password слишком маленький, он должен состоять как минимум из 6 символов'
+        return [registration_is_confirmed, a]
 
     def registration_player(self):
         con = sqlite3.connect("2048_accounts.db")
         cur = con.cursor()
         result = [i[0] for i in cur.execute('SELECT login FROM players')]
-        if self.check(self.login, self.password):
+        if self.check(self.login, self.password)[0]:
             player = [(len(result) + 1, self.login, self.password)]
             cur.executemany('INSERT INTO players VALUES(?,?,?)', player)
             rating = [(len(result) + 1, 0)]
             cur.executemany('INSERT INTO max_score VALUES(?,?)', rating)
             con.commit()
-            print('Поздравляем с успешной регистрацией!')
+            return 'Поздравляем с успешной регистрацией!'
+        else:
+            return self.check(self.login, self.password)[1]
 
 
 class Entrance:
-    def __init__(self):
-        self.login = 'Гошан228'
-        self.password = '332332'
+    def __init__(self, login, password):
+        self.login = login
+        self.password = password
 
     def check(self):
         entrance = False
         con = sqlite3.connect("2048_accounts.db")
         cur = con.cursor()
         result = [i[:2] for i in cur.execute('SELECT login, password FROM players')]
+        a = ''
         for player in result:
             if self.login == player[0]:
                 if self.password == player[1]:
-                    return True
+                    return [True]
                 else:
-                    print('Неверный пароль!')
+                    a = 'Неверный пароль!'
+                    return [False, a]
                 entrance = True
                 break
         if entrance:
-            print('Пользователя с таким логином не существует!')
-        return False
+            a = 'Пользователя с таким логином не существует!'
+        return [False, a]
 
     def entrance_player(self):
-        if self.check():
-            print("Игра началась!")
-            print("Выбирайте сторону куда хотите ходить:\n"
-                  "нажимайте стрелочку влево если вы хотите пойти влево\n"
-                  "нажимайте стрелочку вправо если вы хотите пойти вправо\n"
-                  "нажимайте стрелочку вверх если вы хотите пойти вверх\n"
-                  "нажимайте стрелочку вниз если вы хотите пойти вниз\n"
-                  "напишите new если вы хотите начать новую игру")
-            self.Field1 = Field(self.login, self.password)
-            print(self.Field1)
-            a = input()
-            while a != '0':
-                self.Field1.move(a)
-                print(self.Field1)
-                a = input()
+        if self.check()[0]:
+            return True
+        else:
+            return self.check()[1]
