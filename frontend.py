@@ -6,7 +6,7 @@ from backend import Field
 
 class Design_Field:
     def __init__(self):
-        self.Field1 = Field('Kirill2005', 'Kirill2005')
+        self.Field1 = Field()
         self.WHITE_RESULTS = (255, 255, 255)
         self.blocks = 4
         self.size_block = 130
@@ -17,13 +17,14 @@ class Design_Field:
         pygame.init()
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGTH))
         pygame.display.set_caption('2048')
-        self.colors = {'0':(110, 110, 110), '2':(255, 255, 255),
-                  '4':(255, 250, 205), '8':(255, 161, 97), '16':(255, 104, 0),
-                  '32':(255, 79, 0), '64':(247, 94, 37), '128':(255, 0, 0),
-                  '256':(166, 202, 240), '512':(102, 102, 255), '1024':(37, 40, 80),
-                  '2048':(108, 70, 117)}
+        self.colors = {'0': (110, 110, 110), '2': (255, 255, 255),
+                       '4': (255, 250, 205), '8': (255, 161, 97), '16': (255, 104, 0),
+                       '32': (255, 79, 0), '64': (247, 94, 37), '128': (255, 0, 0),
+                       '256': (166, 202, 240), '512': (102, 102, 255), '1024': (37, 40, 80),
+                       '2048': (108, 70, 117)}
 
-    def displaying_cells(self):
+    def displaying_cells(self, flag=False):
+        self.flag = flag
         score = pygame.font.SysFont('', 60)
         txt_score = score.render(f'Score: {self.Field1.score}', True, (255, 165, 0))
         pygame.draw.rect(self.screen, self.WHITE_RESULTS, self.TITLE_RESULTS)
@@ -43,19 +44,29 @@ class Design_Field:
                 text = font.render(f'{number}', True, (0, 0, 0))
                 self.WIDTH = self.indent * (x + 1) + x * self.size_block
                 self.HEIGTH = self.indent * (y + 1) + y * self.size_block + self.size_block
-                pygame.draw.rect(self.screen, self.colors[str(number)], (self.WIDTH, self.HEIGTH, self.size_block, self.size_block))
+                pygame.draw.rect(self.screen, self.colors[str(number)],
+                                 (self.WIDTH, self.HEIGTH, self.size_block, self.size_block))
                 if number != 0:
                     f_w, f_h = text.get_size()
-                    self.screen.blit(text, (self.WIDTH + (((self.size_block - f_w) // 2)), self.HEIGTH + ((self.size_block - f_h) // 2)))
+                    self.screen.blit(text, (
+                    self.WIDTH + (((self.size_block - f_w) // 2)), self.HEIGTH + ((self.size_block - f_h) // 2)))
+        if flag:
+            hint = pygame.font.SysFont('', 20)
+            recomend = self.Field1.recommended_move()
+            if recomend == 'Невозможно никуда походить':
+                txt_hint = hint.render(f'{recomend}', True, (0, 0, 0))
+            else:
+                txt_hint = hint.render(f'Исскуственный интеллект советует ходить {recomend}', True, (0, 0, 0))
+            self.screen.blit(txt_hint, (10, 100))
 
     def button_new_game(self):
         self.Field1.new_game()
-        self.displaying_cells()
+        self.displaying_cells(self.flag)
 
 
 class menu:
     def __init__(self):
-        self.Field1 = Field('Kirill2005', 'Kirill2005')
+        self.Field1 = Field()
         self.WHITE_RESULTS = (255, 255, 255)
         self.blocks = 4
         self.size_block = 130
@@ -76,6 +87,10 @@ class menu:
         button1 = pygame.font.SysFont('', 30)
         txt_button1 = button1.render(f'Играть с подсказками', True, (0, 0, 0))
         self.screen.blit(txt_button1, (190, 365))
+        pygame.draw.rect(self.screen, (102, 0, 255), (150, 30, 300, 50))
+        button1 = pygame.font.SysFont('', 30)
+        txt_button1 = button1.render(f'Ретинговая таблица', True, (0, 0, 0))
+        self.screen.blit(txt_button1, (205, 45))
         button2 = pygame.font.SysFont('', 30)
         txt_button2 = button2.render(f'Играть без подсказок', True, (0, 0, 0))
         self.screen.blit(txt_button2, (190, 435))
@@ -99,9 +114,9 @@ class menu:
         max_score = self.Field1.max_score()
 
 
-def field_launch(flag=False):
+def field_launch(flag1=False):
     Design_Field1 = Design_Field()
-    Design_Field1.displaying_cells()
+    Design_Field1.displaying_cells(flag1)
     flag = True
     while flag:
         for event in pygame.event.get():
@@ -116,32 +131,87 @@ def field_launch(flag=False):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     Design_Field1.Field1.right_move()
-                    Design_Field1.displaying_cells()
+                    Design_Field1.displaying_cells(flag1)
                 elif event.key == pygame.K_LEFT:
                     Design_Field1.Field1.left_move()
-                    Design_Field1.displaying_cells()
+                    Design_Field1.displaying_cells(flag1)
                 elif event.key == pygame.K_UP:
                     Design_Field1.Field1.top_move()
-                    Design_Field1.displaying_cells()
+                    Design_Field1.displaying_cells(flag1)
                 elif event.key == pygame.K_DOWN:
                     Design_Field1.Field1.down_move()
-                    Design_Field1.displaying_cells()
+                    Design_Field1.displaying_cells(flag1)
             pygame.display.update()
     Design_Field1.button_new_game()
     menu_launch()
 
+
 def menu_launch():
     Menu = menu()
     Menu.displaying_cells()
-    while True:
+    flag = True
+    while flag:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit(0)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.pos[0] >= 150 and event.pos[0] <= 450 and event.pos[1] >= 350 and event.pos[1] <= 400:
-                    field_launch(True)
+                    flag1 = 1
+                    flag = False
                 elif event.pos[0] >= 150 and event.pos[0] <= 450 and event.pos[1] >= 420 and event.pos[1] <= 470:
-                    field_launch()
+                    flag1 = 2
+                    flag = False
+                elif event.pos[0] >= 150 and event.pos[0] <= 450 and event.pos[1] >= 30 and event.pos[1] <= 80:
+                    flag = False
+                    flag1 = 3
             pygame.display.update()
-print(field_launch())
+    if flag1 == 1:
+        field_launch(True)
+    elif flag1 == 2:
+        field_launch()
+    else:
+        rating()
+
+
+def rating():
+    WIDTH = 570
+    HEIGTH = WIDTH + 130
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGTH))
+    pygame.display.set_caption('2048')
+    fon = pygame.image.load('КЕ.jpg').convert()
+    fon = pygame.transform.smoothscale(fon, screen.get_size())
+    screen.blit(fon, (0, 0))
+    pygame.draw.rect(screen, (255, 140, 0), (400, 20, 150, 50))
+    exit1 = pygame.font.SysFont('', 30)
+    txt_exit1 = exit1.render(f"Выход", True, (0, 0, 0))
+    screen.blit(txt_exit1, (440, 35))
+    rating = open('rating.txt', 'r', encoding='utf=8')
+    ratings = rating.readlines()
+    rat = pygame.font.SysFont('', 40)
+    txt_rat = rat.render(f"Рейтинг", True, (255, 255, 255))
+    screen.blit(txt_rat, (170, 490))
+    for i in range(len(ratings)):
+        if '\n' in ratings[i]:
+            ratings[i] = ratings[i][:-1]
+    ratings.sort(key=lambda x: -int(x))
+    for i in range(min(len(ratings), 6)):
+        player = pygame.font.SysFont('', 40)
+        txt_player = player.render(f"{i + 1}: {ratings[i]}", True, (255, 255, 255))
+        screen.blit(txt_player, (180, 520 + i * 30))
+
+    flag = True
+    while flag:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.pos[0] >= 400 and event.pos[0] <= 550 and event.pos[1] >= 20 and event.pos[1] <= 170:
+                    flag = False
+            pygame.display.update()
+    menu_launch()
+
+
+menu_launch()

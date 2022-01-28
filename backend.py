@@ -1,10 +1,11 @@
 import pygame
 import random
 import sqlite3
+import copy
 
 
 class Field:
-    def __init__(self, login, password, recommended=False):
+    def __init__(self, recommended=False):
         self.field = [[0, 0, 0, 0],
                       [0, 0, 0, 0],
                       [0, 0, 0, 0],
@@ -12,33 +13,17 @@ class Field:
         self.score = 0
         self.random_cube()
         self.random_cube()
-        self.login = login
-        self.password = password
+        self.login = 'a'
+        self.password = 'a'
         self.recommended = recommended
         self.left = 0
         self.right = 0
         self.top = 0
         self.down = 0
-
-
-    def recommended_move(self):
-        field_copy = self.field.copy()
-        self.left_move()
-        self.field = field_copy.copy()
-        self.right_move()
-        self.field = field_copy.copy()
-        self.down_move()
-        self.field = field_copy.copy()
-        self.top_move()
-        self.field = field_copy.copy()
-        if self.left >= self.right and self.down <= self.left and self.left >= self.top:
-            return 'left'
-        elif self.right >= self.down and self.right >= self.top and self.right >= self.left:
-            return 'right'
-        elif self.top >= self.right and self.top >= self.down and self.top >= self.left:
-            return 'top'
-        elif self.down >= self.right and self.down >= self.top and self.down >= self.left:
-            return 'down'
+        self.left_s = 0
+        self.right_s = 0
+        self.top_s = 0
+        self.down_s = 0
 
     def random_cube(self):
         cubes = []
@@ -49,9 +34,12 @@ class Field:
         randomcube = random.choice(cubes)
         self.field[randomcube // 4][randomcube % 4] = 2
 
-    def left_move(self):
+    def left_move(self, flag=False):
         summ = 0
         connection = 0
+        if flag:
+            copy_l = copy.deepcopy(self.field)
+            copy_s = self.score
         for y in range(len(self.field)):
             for x in range(len(self.field)):
                 for cord_x in range(len(self.field)):
@@ -74,11 +62,18 @@ class Field:
                     summ += 1
         if summ > 0:
             self.random_cube()
+        if flag:
+            self.field = copy.deepcopy(copy_l)
+            self.score = copy_s
         self.left = connection
+        self.left_s = summ
 
-    def right_move(self):
+    def right_move(self, flag=False):
         summ = 0
         connection = 0
+        if flag:
+            copy_l = copy.deepcopy(self.field)
+            copy_s = self.score
         for y in range(len(self.field)):
             for x in range(len(self.field) - 1, -1, -1):
                 for cord_x in range(len(self.field) - 1, -1, -1):
@@ -101,11 +96,18 @@ class Field:
                     summ += 1
         if summ > 0:
             self.random_cube()
+        if flag:
+            self.field = copy.deepcopy(copy_l)
+            self.score = copy_s
         self.right = connection
+        self.right_s = summ
 
-    def down_move(self):
+    def down_move(self, flag=False):
         summ = 0
         connection = 0
+        if flag:
+            copy_l = copy.deepcopy(self.field)
+            copy_s = self.score
         for x in range(len(self.field)):
             for y in range(len(self.field) - 1, -1, -1):
                 for cord_y in range(len(self.field) - 1, -1, -1):
@@ -128,9 +130,16 @@ class Field:
                     self.score += self.field[y][x]
         if summ > 0:
             self.random_cube()
+        if flag:
+            self.field = copy.deepcopy(copy_l)
+            self.score = copy_s
         self.down = connection
+        self.down_s = summ
 
-    def top_move(self):
+    def top_move(self, flag=False):
+        if flag:
+            copy_l = copy.deepcopy(self.field)
+            copy_s = self.score
         summ = 0
         connection = 0
         for x in range(len(self.field)):
@@ -155,7 +164,11 @@ class Field:
                     self.score += self.field[y][x]
         if summ > 0:
             self.random_cube()
+        if flag:
+            self.field = copy.deepcopy(copy_l)
+            self.score = copy_s
         self.top = connection
+        self.top_s = summ
 
     def __str__(self):
         for y in range(len(self.field)):
@@ -179,23 +192,38 @@ class Field:
                       [0, 0, 0, 0],
                       [0, 0, 0, 0],
                       [0, 0, 0, 0]]
-        con = sqlite3.connect("2048_accounts.db")
-        cur = con.cursor()
-        result = [i[:2] for i in cur.execute('SELECT login, password FROM players')]
-        number = 0
-        for player in range(len(result)):
-            if result[player][0] == self.login and result[player][1] == self.password:
-                number = player
-                break
-        max_score = [i[0] for i in cur.execute('SELECT max_score FROM max_score')]
-        if int(max_score[number]) < self.score:
-            cur.execute("""UPDATE max_score
-                                SET max_score = (?)
-                                WHERE id_score = (?)""", [self.score, number + 1])
-        con.commit()
+        rating = open('rating.txt', 'a', encoding='utf-8')
+        rating.write('\n' + str(self.score))
+        rating.close()
         self.score = 0
         self.random_cube()
         self.random_cube()
+
+    def recommended_move(self):
+        self.left_move(True)
+        self.right_move(True)
+        self.down_move(True)
+        self.top_move(True)
+        print(self.right, self.left, self.top, self.down)
+        if self.left >= self.right and self.down <= self.left and self.left >= self.top and self.left_s != 0:
+            return 'left'
+        elif self.right >= self.down and self.right >= self.top and self.right >= self.left and self.right_s != 0:
+            return 'right'
+        elif self.top >= self.right and self.top >= self.down and self.top >= self.left and self.top_s != 0:
+            return 'top'
+        elif self.down >= self.right and self.down >= self.top and self.down >= self.left and self.down_s:
+            return 'down'
+        else:
+            if self.left_s != 0:
+                return 'left'
+            elif self.right_s != 0:
+                return 'right'
+            elif self.top_s != 0:
+                return 'top'
+            elif self.down_s != 0:
+                return 'down'
+            else:
+                return 'Невозможно никуда походить'
 
     def max_score(self):
         con = sqlite3.connect("2048_accounts.db")
