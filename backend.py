@@ -175,18 +175,6 @@ class Field:
             print(self.field[y])
         return '------------------'
 
-    def move(self, side):
-        if side == 'l':
-            self.left_move()
-        if side == 'r':
-            self.right_move()
-        if side == 'd':
-            self.down_move()
-        if side == 't':
-            self.top_move()
-        if side == 'new':
-            self.new_game()
-
     def new_game(self):
         self.field = [[0, 0, 0, 0],
                       [0, 0, 0, 0],
