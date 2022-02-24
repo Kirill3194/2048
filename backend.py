@@ -2,6 +2,8 @@ import pygame
 import random
 import sqlite3
 import copy
+import os
+import shutil
 
 
 class Field:
@@ -54,7 +56,7 @@ class Field:
                         else:
                             break
                         change_x -= 1
-                if x + 1 < len(self.field) and self.field[y][x] == self.field[y][x + 1] and self.field[y][x] != 0:
+                if x + 1 < len(self.field) and self.field[y][x] == self.field[y][x + 1] and self.field[y][x] != 0 and self.field[y][x] != 2048:
                     connection += 1
                     self.field[y][x] = self.field[y][x] * 2
                     self.score += self.field[y][x]
@@ -88,7 +90,7 @@ class Field:
                         else:
                             break
                         change_x += 1
-                if x - 1 >= 0 and self.field[y][x] == self.field[y][x - 1] and self.field[y][x] != 0:
+                if x - 1 >= 0 and self.field[y][x] == self.field[y][x - 1] and self.field[y][x] != 0 and self.field[y][x] != 2048:
                     connection += 1
                     self.field[y][x] = self.field[y][x] * 2
                     self.score += self.field[y][x]
@@ -122,7 +124,7 @@ class Field:
                         else:
                             break
                         change_y += 1
-                if y - 1 >= 0 and self.field[y][x] == self.field[y - 1][x] and self.field[y][x] != 0:
+                if y - 1 >= 0 and self.field[y][x] == self.field[y - 1][x] and self.field[y][x] != 0 and self.field[y][x] != 2048:
                     connection += 1
                     self.field[y][x] = self.field[y][x] * 2
                     self.field[y - 1][x] = 0
@@ -156,7 +158,7 @@ class Field:
                         else:
                             break
                         change_y -= 1
-                if y + 1 < len(self.field) and self.field[y][x] == self.field[y + 1][x] and self.field[y][x] != 0:
+                if y + 1 < len(self.field) and self.field[y][x] == self.field[y + 1][x] and self.field[y][x] != 0 and self.field[y][x] != 2048:
                     connection += 1
                     self.field[y][x] = self.field[y][x] * 2
                     self.field[y + 1][x] = 0
@@ -192,7 +194,6 @@ class Field:
         self.right_move(True)
         self.down_move(True)
         self.top_move(True)
-        print(self.right, self.left, self.top, self.down)
         if self.left >= self.right and self.down <= self.left and self.left >= self.top and self.left_s != 0:
             return 'left'
         elif self.right >= self.down and self.right >= self.top and self.right >= self.left and self.right_s != 0:
@@ -224,6 +225,17 @@ class Field:
                 break
         max_score = [i[0] for i in cur.execute('SELECT max_score FROM max_score')][number]
         return max_score
+
+
+def photoss(way, num):
+    filename, file_extension = os.path.splitext(f'{way}')
+    if os.path.isfile(f'{way}') and file_extension == '.jpg':
+        shutil.copy(f'{way}', f'photos/{num}.jpg')
+        return True
+    else:
+        return False
+
+
 
 
 class Registration:
