@@ -228,20 +228,22 @@ class Field:
 
 
 def photoss(way, num):
-    filename, file_extension = os.path.splitext(f'{way}')
-    if os.path.isfile(f'{way}') and file_extension == '.jpg':
-        shutil.copy(f'{way}', f'photos/{num}.jpg')
-        return True
-    else:
-        return False
+    num1 = 0
+    for i in range(1, 11):
+        if os.path.isfile(f'{way}/{2 ** i}.jpg'):
+            shutil.copy(f'{way}/{2 ** i}.jpg', f'photos/{2 ** i}.jpg')
+            num1 += 1
+        else:
+            return False
+    return True
 
 
 
 
 class Registration:
     def __init__(self):
-        self.login = 'Гошан228'
-        self.password = '332332'
+        self.login = ''
+        self.password = ''
 
     def check(self, login, password):
         con = sqlite3.connect("2048_accounts.db")

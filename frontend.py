@@ -3,7 +3,7 @@ import sqlite3
 import pygame
 from backend import Field
 from backend import photoss
-flaggg = True
+flaggg = False
 
 
 class Design_Field:
@@ -249,13 +249,32 @@ def displaying_cells_photos(a, b, c=False):
         screen.blit(fon, (0, 0))
         pygame.draw.rect(screen, (255, 255, 255), (50, 620, 470, 50))
         pygame.draw.rect(screen, (255, 140, 0), (400, 20, 150, 50))
-        txt = pygame.font.SysFont('', 20)
-        txt_txt = txt.render(f"Выведите путь к картинке для кубика под номером {a} в формате jpg", True, (255, 255, 255))
+        txt = pygame.font.SysFont('', 25)
+        txt_txt = txt.render(f"Выведите путь к файлу, в котором у вас лежат картинки", True, (255, 255, 255))
+        screen.blit(txt_txt, (45, 555))
+        txt = pygame.font.SysFont('', 25)
+        txt_txt = txt.render(
+            f"с названиями для кубика с номером 2 - 2.jpg,", True,
+            (255, 255, 255))
+        screen.blit(txt_txt, (45, 570))
+        txt = pygame.font.SysFont('', 25)
+        txt_txt = txt.render(
+            f"для кубика с номером 4 - 4.jpg, ...,", True,
+            (255, 255, 255))
+        screen.blit(txt_txt, (45, 585))
+        txt = pygame.font.SysFont('', 25)
+        txt_txt = txt.render(
+            f"для кубика с номером 2048 - 2048.jpg",
+            True,
+            (255, 255, 255))
         screen.blit(txt_txt, (45, 600))
         if c:
-            txt1 = pygame.font.SysFont('', 25)
-            txt1_txt = txt1.render(f"Неправильный путь к картинке!!!", True, (255, 255, 255))
-            screen.blit(txt1_txt, (130, 550))
+            txt = pygame.font.SysFont('', 30)
+            txt_txt = txt.render(
+                f"Такого файла не существует!",
+                True,
+                (255, 0, 0))
+            screen.blit(txt_txt, (45, 530))
         txt = pygame.font.SysFont('', 25)
         if len(b) > 30:
             b1 = len(b)
@@ -286,10 +305,8 @@ def photos():
                 if event.key == pygame.K_RETURN:
                     need_inpit = False
                     if photoss(text_input, num):
-                        if num + num > 2048:
-                            flag = False
-                            flaggg = True
-                        displaying_cells_photos(num + num, text_input, ceill)
+                        flag = False
+                        flaggg = True
                         num += num
                     else:
                         ceill = True
