@@ -94,9 +94,7 @@ class menu:
         pygame.display.set_caption('2048')
 
     def displaying_cells(self):
-        fon = pygame.image.load('КЕ.jpg').convert()
-        fon = pygame.transform.smoothscale(fon, self.screen.get_size())
-        self.screen.blit(fon, (0, 0))
+        self.screen.fill((221, 183, 52))
         pygame.draw.rect(self.screen, (255, 140, 0), (150, 350, 300, 50))
         pygame.draw.rect(self.screen, (255, 69, 0), (150, 420, 300, 50))
         button1 = pygame.font.SysFont('', 30)
@@ -114,22 +112,22 @@ class menu:
         txt_button2 = button2.render(f'Играть без подсказок', True, (0, 0, 0))
         self.screen.blit(txt_button2, (190, 435))
         rules = pygame.font.SysFont('', 30)
-        txt_rules = rules.render(f"Правила игры", True, (255, 255, 255))
+        txt_rules = rules.render(f"Правила игры", True, (0, 0, 0))
         self.screen.blit(txt_rules, (180, 480))
-        rules = pygame.font.SysFont('', 20)
-        txt_rules = rules.render(f"Выбирайте сторону куда хотите ходить:", True, (255, 255, 255))
-        self.screen.blit(txt_rules, (60, 520))
-        rules = pygame.font.SysFont('', 20)
-        txt_rules = rules.render(f"нажимайте стрелочку влево если вы хотите пойти влево", True, (255, 255, 255))
-        self.screen.blit(txt_rules, (60, 545))
-        rules = pygame.font.SysFont('', 20)
-        txt_rules = rules.render(f"нажимайте стрелочку вправо если вы хотите пойти вправо", True, (255, 255, 255))
-        self.screen.blit(txt_rules, (60, 570))
-        txt_rules = rules.render(f"нажимайте стрелочку вверх если вы хотите пойти вверх", True, (255, 255, 255))
-        self.screen.blit(txt_rules, (60, 595))
-        rules = pygame.font.SysFont('', 20)
-        txt_rules = rules.render(f"нажимайте стрелочку вниз если вы хотите пойти вниз", True, (255, 255, 255))
-        self.screen.blit(txt_rules, (60, 620))
+        rules = pygame.font.SysFont('', 23)
+        txt_rules = rules.render(f"Выбирайте сторону куда хотите ходить:", True, (0, 0, 0))
+        self.screen.blit(txt_rules, (100, 520))
+        rules = pygame.font.SysFont('', 23)
+        txt_rules = rules.render(f"нажимайте стрелочку влево если вы хотите пойти влево", True, (0, 0, 0))
+        self.screen.blit(txt_rules, (100, 545))
+        rules = pygame.font.SysFont('', 23)
+        txt_rules = rules.render(f"нажимайте стрелочку вправо если вы хотите пойти вправо", True, (0, 0, 0))
+        self.screen.blit(txt_rules, (100, 570))
+        txt_rules = rules.render(f"нажимайте стрелочку вверх если вы хотите пойти вверх", True, (0, 0, 0))
+        self.screen.blit(txt_rules, (100, 595))
+        rules = pygame.font.SysFont('', 23)
+        txt_rules = rules.render(f"нажимайте стрелочку вниз если вы хотите пойти вниз", True, (0, 0, 0))
+        self.screen.blit(txt_rules, (100, 620))
         max_score = self.Field1.max_score()
 
 
@@ -203,10 +201,7 @@ def rating():
     HEIGTH = WIDTH + 130
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGTH))
-    pygame.display.set_caption('2048')
-    fon = pygame.image.load('КЕ.jpg').convert()
-    fon = pygame.transform.smoothscale(fon, screen.get_size())
-    screen.blit(fon, (0, 0))
+    screen.fill((221, 183, 52))
     pygame.draw.rect(screen, (255, 140, 0), (400, 20, 150, 50))
     exit1 = pygame.font.SysFont('', 30)
     txt_exit1 = exit1.render(f"Выход", True, (0, 0, 0))
@@ -214,16 +209,16 @@ def rating():
     rating = open('rating.txt', 'r', encoding='utf=8')
     ratings = rating.readlines()
     rat = pygame.font.SysFont('', 40)
-    txt_rat = rat.render(f"Рейтинг", True, (255, 255, 255))
-    screen.blit(txt_rat, (170, 490))
+    txt_rat = rat.render(f"Рейтинг", True, (0, 0, 0))
+    screen.blit(txt_rat, (250, 100))
     for i in range(len(ratings)):
         if '\n' in ratings[i]:
             ratings[i] = ratings[i][:-1]
     ratings.sort(key=lambda x: -int(x))
     for i in range(min(len(ratings), 6)):
         player = pygame.font.SysFont('', 40)
-        txt_player = player.render(f"{i + 1}: {ratings[i]}", True, (255, 255, 255))
-        screen.blit(txt_player, (180, 520 + i * 30))
+        txt_player = player.render(f"{i + 1}: {ratings[i]}", True, (0, 0, 0))
+        screen.blit(txt_player, (250, 140 + i * 30))
 
     flag = True
     while flag:
@@ -244,34 +239,32 @@ def displaying_cells_photos(a, b, c=False):
         pygame.init()
         screen = pygame.display.set_mode((WIDTH, HEIGTH))
         pygame.display.set_caption('2048')
-        fon = pygame.image.load('КЕ.jpg').convert()
-        fon = pygame.transform.smoothscale(fon, screen.get_size())
-        screen.blit(fon, (0, 0))
+        screen.fill((221, 183, 52))
         pygame.draw.rect(screen, (255, 255, 255), (50, 620, 470, 50))
         pygame.draw.rect(screen, (255, 140, 0), (400, 20, 150, 50))
         txt = pygame.font.SysFont('', 25)
-        txt_txt = txt.render(f"Выведите путь к файлу, в котором у вас лежат картинки", True, (255, 255, 255))
+        txt_txt = txt.render(f"Выведите путь к файлу, в котором у вас лежат картинки", True, (0, 0, 0))
         screen.blit(txt_txt, (45, 555))
         txt = pygame.font.SysFont('', 25)
         txt_txt = txt.render(
             f"с названиями для кубика с номером 2 - 2.jpg,", True,
-            (255, 255, 255))
+            (0, 0, 0))
         screen.blit(txt_txt, (45, 570))
         txt = pygame.font.SysFont('', 25)
         txt_txt = txt.render(
             f"для кубика с номером 4 - 4.jpg, ...,", True,
-            (255, 255, 255))
+            (0, 0, 0))
         screen.blit(txt_txt, (45, 585))
         txt = pygame.font.SysFont('', 25)
         txt_txt = txt.render(
             f"для кубика с номером 2048 - 2048.jpg",
             True,
-            (255, 255, 255))
+            (0, 0, 0))
         screen.blit(txt_txt, (45, 600))
         if c:
             txt = pygame.font.SysFont('', 30)
             txt_txt = txt.render(
-                f"Такого файла не существует!",
+                f"Файл не корректен!",
                 True,
                 (255, 0, 0))
             screen.blit(txt_txt, (45, 530))
